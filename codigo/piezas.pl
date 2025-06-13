@@ -1,4 +1,5 @@
 :- module(piezas, [nombrePiezas/1,pieza/2,mostrar/1,agrupar/2]).
+:- set_prolog_flag(encoding, utf8).
 
 nombrePiezas([a, b, c, d, e, f, g, h, i, j, k, l]).
 
