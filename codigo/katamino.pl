@@ -10,7 +10,7 @@ sublista(Descartar, Tomar, L, R) :-
     append(R, _, Restantes),
     length(R,Tomar).
 
-%! cantColumnas(+K, +L) : devuelve true sii la lista L tiene tamaño K
+%! cantColumnas(+K, -L)
 cantColumnas(K, L) :- length(L, K).
 
 %! tablero(+K, -T)
@@ -31,11 +31,25 @@ coordenadas(T, (I,J)) :-
     nth1(I, T, Fila),
     nth1(J, Fila, _).
 
+% lista_de_piezas(+K, +L1, -L2)
+lista_de_piezas(0,_,[]).
+lista_de_piezas(Cantidad, [Pieza|RestoPiezas], [Pieza|RestoSalida]) :-
+    Cantidad > 0,
+    Cantidad2 is Cantidad -1,
+    length(RestoPiezas,PiezasRestantes),
+    Cantidad2 =< PiezasRestantes,
+    lista_de_piezas(Cantidad2,RestoPiezas,RestoSalida).
+lista_de_piezas(Cantidad, [_|RestoPiezas], Salida) :-
+    Cantidad > 0,
+    length(RestoPiezas,PiezasRestantes),
+    Cantidad =< PiezasRestantes,
+    lista_de_piezas(Cantidad,RestoPiezas,Salida).
+
 %! kPiezas(+K, -PS)
 
 kPiezas(K, PS) :-
-    K is K,
-    PS is PS.
+    nombrePiezas(Letras),
+    lista_de_piezas(K, Letras, PS)
 
 %! extraerColumnas(+I, +C, +F, -SF)
 
