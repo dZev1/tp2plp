@@ -6,7 +6,14 @@ sublista(Descartar, Tomar, L, R) :-
     append(Descartados, Restantes, L), 
     length(Descartados, Descartar), 
     append(R, _, Restantes),
-    length(R,Tomar).
+    length(R, Tomar).
+
+% sublista/4 es reversible en su primer y cuarto argumento, porque:
+% El predicado divide la lista L en dos partes: Descartados, cuya longitud es Descartar,
+% y Restantes, que contiene a la lista R como prefijo. La longitud de esta lista R se obtiene o se verifica
+% con length(R, Tomar). Como tanto append/3 como length/2 son predicados reversibles en todos sus argumentos,
+% entonces sublista/4 preservará la reversibilidad para cualquier patrón donde esté instanciada la lista L.
+% Por lo tanto, también se puede utilizar el patrón sublista(-Descartar, ?Tomar, +L, +R).
 
 %! cantColumnas(+K, -L)
 cantColumnas(K, L) :- length(L, K).
