@@ -1,7 +1,5 @@
 :- use_module(piezas).
 
-% Completar ...
-
 %! sublista(+Descartar, +Tomar, +L, -R)
 
 sublista(Descartar, Tomar, L, R) :- 
@@ -49,7 +47,7 @@ lista_de_piezas(Cantidad, [_|RestoPiezas], Salida) :-
 
 kPiezas(K, PS) :-
     nombrePiezas(Letras),
-    lista_de_piezas(K, Letras, PS)
+    lista_de_piezas(K, Letras, PS).
 
 %! extraerColumnas(+I, +C, +F, -SF)
 
@@ -64,3 +62,41 @@ seccionTablero(T, ALTO, ANCHO, (I, J), ST) :-
     sublista(I1, ALTO, T, Filas),
     maplist(extraerColumnas(J, ANCHO), Filas, ST).
 
+%! ubicarPieza(+Tablero, +Identificador)
+
+ubicarPieza(Tablero, Identificador) :-
+    pieza(Identificador, Pieza),            
+    tamaño(Pieza, F, C),
+    tamaño(Tablero, 5, K),
+    FilaValidas is 5 - F + 1,
+    between(1, FilaValidas, I),
+    ColumnasValidas is K - C + 1,
+    between(1, ColumnasValidas, J),
+    seccionTablero(Tablero, F, C, (I, J), ST),
+    ST = Pieza.
+
+%! poda(+Poda, +Tablero)
+poda(sinPoda, _).
+poda(podaMod5, T) :- todosGruposLibresModulo5(T).
+
+%! ubicarPiezas(+Tablero, +Poda, +Identificadores)
+ubicarPiezas(Tablero, Poda, Identificadores) :-
+    poda(Poda, Tablero),
+    maplist(ubicarPieza(Tablero), Identificadores).
+
+%! llenarTablero(+Poda, +Columnas, -Tablero)
+llenarTablero(Poda, Columnas, Tablero) :-
+    tablero(Columnas, Tablero),
+    kPiezas(Columnas, Identificadores),
+    ubicarPiezas(Tablero, Poda, Identificadores).
+
+%! cantSoluciones(+Poda, +Columnas, -N)
+cantSoluciones(Poda, Columnas, N) :-
+    findall(T, llenarTablero(Poda, Columnas, T), TS),
+    length(TS, N).
+
+% 23,320,023 inferences, 2.133 CPU in 2.133 seconds (100% CPU, 10932656 Lips)
+% N = 28.
+
+% 1,274,648,399 inferences, 127.565 CPU in 127.519 seconds (100% CPU, 9992156 Lips)
+% N = 200.
