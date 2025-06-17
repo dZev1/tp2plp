@@ -3,6 +3,31 @@
 
 :- begin_tests(katamino).
 
+
+
+lista_de_piezas(0,_,[]).
+lista_de_piezas(Cantidad, [Pieza|RestoPiezas], [Pieza|RestoSalida]) :-
+    Cantidad > 0,
+    Cantidad2 is Cantidad -1,
+    length(RestoPiezas,PiezasRestantes),
+    Cantidad2 =< PiezasRestantes,
+    lista_de_piezas(Cantidad2,RestoPiezas,RestoSalida).
+lista_de_piezas(Cantidad, [_|RestoPiezas], Salida) :-
+    Cantidad > 0,
+    length(RestoPiezas,PiezasRestantes),
+    Cantidad =< PiezasRestantes,
+    lista_de_piezas(Cantidad,RestoPiezas,Salida).
+
+
+
+test_kPiezas_unicos(ListaDePiezas) :-
+    maplist(msort,ListaDePiezas,ListaDePiezasOrdenadas),    % ordeno cada lista alfabéticamente para detectar permutaciones
+    length(ListaDePiezasOrdenadas, LongitudListaConRepetidos),
+    sort(ListaDePiezasOrdenadas, ListaSinRepetidos),                             % sort borra las permutaciones (que a sus ojos son valores duplicados)
+    length(ListaSinRepetidos, LongitudListaSinRepetidos),
+    LongitudListaConRepetidos =:= LongitudListaSinRepetidos.
+
+
 test(sublista_basica) :-
     sublista(2, 3, [a, b, c, d, e, f], R),
     R == [c, d, e].
@@ -58,28 +83,73 @@ test(seccionTablero_FueraDeRango, [fail]) :-
 
 
 test(ubicarPieza_sin_espacio, [fail]) :-
-    tablero(3, T),
-    ubicarPieza(T, l).
+    tablero(1, T),
+    ubicarPieza(T, e).
 
 
-test(ubicarPieza_con_espacio) :-
+test(ubicarPieza_e) :-
     tablero(3, T),
-    ubicarPieza(T, a),
-    T == [[a,a,_],
-          [a,,],  
-          [a,,],
-          [,,_],
-          [,,_]].
+    once(ubicarPieza(T, e)),
+    T = [[_,e,e],
+         [e,e,e],
+         [_,_,_],
+         [_,_,_],
+         [_,_,_]].
 
-test(ubicarPieza_con_espacio2) :-
+test(ubicarPieza_e_fila_ocupada) :-
     tablero(3, T),
-    nth1(1, T, Fila1),
-    nth1(1, Fila1, x),
-    ubicarPieza(T, a),
-     T == [[x,a,a],
-          [,a,],
-          [,a,],
-          [,a,],
-          [,,_]].
+    nth1(1, T, [x,x,x]),
+    once(ubicarPieza(T, e)),
+    T = [[x,x,x],
+         [_,e,e],
+         [e,e,e],
+         [_,_,_],
+         [_,_,_]].
+
+test(ubicarPieza_e_rotada) :-
+    tablero(3, T),
+    nth1(1, T, F1), nth1(1, F1, x),
+    nth1(2, T, F2), nth1(1, F2, x),
+    once(ubicarPieza(T, e)),    
+    T = [[x,x,_],
+         [x,e,e],
+         [_,e,e],
+         [_,_,e],
+         [_,_,_]].
+
+test(ubicarPiezas_imposible, [fail]) :-
+    tablero(2, T),
+    ubicarPiezas(T, sinPoda, [x]).
+
+test(ubicarPiezas_conEspacios) :-
+    tablero(4, T),
+    once(ubicarPiezas(T, sinPoda, [e,f,g])),
+    findall(v, (member(F,T), member(C,F), var(C), v=v), Vars),
+    length(Vars, 5).
+
+
+% se podria agregar un test para ubicarPieza cuando el tablero esta lleno 
+
+
+test(llenarTablero_tablerolleno) :-
+    once(llenarTablero(sinPoda, 3, T)),         
+    \+ ( member(F, T),
+         member(C, F),
+         var(C) ).
+
+
+test(cantSoluciones_5x2_K2_0) :-
+    cantSoluciones(sinPoda, 2, N),
+    N == 0.
+
+test(cantSoluciones_5x3_K3_28) :-
+    cantSoluciones(sinPoda, 3, N),
+    N == 28.
+
+test(cantSoluciones_5x4_K4_200) :-
+    cantSoluciones(sinPoda, 4, N),
+    N == 200.
+
+
 
 :- end_tests(katamino).
