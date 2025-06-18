@@ -13,7 +13,7 @@ sublista(Descartar, Tomar, L, R) :-
 % y Restantes, que contiene a la lista R como prefijo. La longitud de esta lista R se obtiene o se verifica
 % con length(R, Tomar). Como tanto append/3 como length/2 son predicados reversibles en todos sus argumentos,
 % entonces sublista/4 preservará la reversibilidad para cualquier patrón donde esté instanciada la lista L.
-% Por lo tanto, también se puede utilizar el patrón sublista(-Descartar, ?Tomar, +L, +R).
+% Por lo tanto, también se puede utilizar el patrón sublista(-Descartar, +Tomar, +L, +R).
 
 %! cantColumnas(+K, -L)
 cantColumnas(K, L) :- length(L, K).
@@ -84,7 +84,24 @@ ubicarPieza(Tablero, Identificador) :-
 
 %! poda(+Poda, +Tablero)
 poda(sinPoda, _).
-poda(podaMod5, T) :- todosGruposLibresModulo5(T).
+poda(podaMod5, Tablero) :- todosGruposLibresModulo5(Tablero).
+
+%! posLibres(+Tablero, -Pos)
+posLibres(Tablero, (I,J)) :-
+    nth1(I, Tablero, Fila),
+    nth1(J, Fila, Casilla),
+    var(Casilla).
+
+%! todosGruposLibresModulo5(+Tablero)
+todosGruposLibresModulo5(Tablero) :-
+    tamaño(Tablero, Filas, Cols),
+    findall((I,J), (between(1, Filas, I), between(1, Cols, J)), Coordenadas),
+
+    findall((I,J), (member((I,J), Coordenadas), posLibres(Tablero, (I,J))), PosLibres),
+    agrupar(PosLibres, VecinosLibres),
+
+    forall(member(Grupo, VecinosLibres), (length(Grupo, Tamaño), mod(Tamaño, 5) =:= 0)).
+
 
 %! ubicarPiezas(+Tablero, +Poda, +Identificadores)
 ubicarPiezas(Tablero, Poda, Identificadores) :-
