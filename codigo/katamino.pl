@@ -104,9 +104,11 @@ todosGruposLibresModulo5(Tablero) :-
 
 
 %! ubicarPiezas(+Tablero, +Poda, +Identificadores)
-ubicarPiezas(Tablero, Poda, Identificadores) :-
+ubicarPiezas(_, _, []).
+ubicarPiezas(Tablero, Poda, [I|Is]) :-
     poda(Poda, Tablero),
-    maplist(ubicarPieza(Tablero), Identificadores).
+    ubicarPieza(Tablero, I),
+    ubicarPiezas(Tablero, Poda, Is).
 
 %! llenarTablero(+Poda, +Columnas, -Tablero)
 llenarTablero(Poda, Columnas, Tablero) :-
